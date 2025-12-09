@@ -59,7 +59,7 @@ ax = Axis(fig[1, 1], xlabel="k", ylabel="ΔE", yscale=log10, title="Energy Gap v
 lines!(ax, df.k, df.ΔE)
 scatter!(ax, df.k, df.ΔE)
 
-display(fig)
+# display(fig)
 save(png_path, fig)
 
 ## --------------------------- Save results ------------------------------------
