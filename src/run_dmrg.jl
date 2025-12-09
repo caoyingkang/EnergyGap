@@ -65,13 +65,3 @@ save(png_path, fig)
 
 ## --------------------------- Save results ------------------------------------
 CSV.write(csv_path, df)
-
-## --------------------------- Sanity checks on MPS ----------------------------------------
-f = h5open(h5_path, "r")
-for k in 1:30
-    psi0 = read(f, "k=$k/psi0", MPS)
-    psi1 = read(f, "k=$k/psi1", MPS)
-    @show k, inner(psi0, psi1)
-end
-close(f)
-
