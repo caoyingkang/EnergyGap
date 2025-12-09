@@ -90,6 +90,7 @@ function run_dmrg(
     nsweeps::Int,
     maxdim::Vector{Int},
     cutoff::Float64,
+    eigsolve_krylovdim::Int,
     outputlevel::Int,
     conv_check_length::Int,
     conv_tol::Float64,
@@ -97,17 +98,30 @@ function run_dmrg(
     observer = EnergyObserver(conv_check_length=conv_check_length, conv_tol=conv_tol)
     if isnothing(ψs_to_avoid)
         # Find ground state
-        E, ψ = dmrg(H, ψ0;
-            nsweeps=nsweeps, maxdim=maxdim, cutoff=cutoff, outputlevel=outputlevel, observer=observer)
+        E, ψ = dmrg(
+            H, ψ0;
+            nsweeps=nsweeps,
+            maxdim=maxdim,
+            cutoff=cutoff,
+            eigsolve_krylovdim=eigsolve_krylovdim,
+            outputlevel=outputlevel,
+            observer=observer
+        )
     else
         # Find excited state orthogonal to ψs_to_avoid
-        E, ψ = dmrg(H, ψs_to_avoid, ψ0; weight=1.0,
-            nsweeps=nsweeps, maxdim=maxdim, cutoff=cutoff, outputlevel=outputlevel, observer=observer)
+        E, ψ = dmrg(
+            H, ψs_to_avoid, ψ0;
+            weight=1.0,
+            nsweeps=nsweeps,
+            maxdim=maxdim,
+            cutoff=cutoff,
+            eigsolve_krylovdim=eigsolve_krylovdim,
+            outputlevel=outputlevel,
+            observer=observer
+        )
     end
     return E, ψ
 end
-
-# TODO: change kwargs to try to improve convergence: eigsolve_krylovdim, noise
 
 
 """
@@ -119,9 +133,10 @@ function compute_ground_and_first_excited_states(
     nsweeps::Int=100,
     maxdim::Vector{Int}=[10, 20, 100, 100, 200],
     cutoff::Float64=1e-10,
+    eigsolve_krylovdim::Int=3,
     outputlevel::Int=1,
     conv_check_length::Int=4,
-    conv_tol::Float64=1e-8,
+    conv_tol::Float64=1e-6,
     rng::AbstractRNG=Random.default_rng()
 )
     println("Computing energy gap using DMRG...")
@@ -134,15 +149,26 @@ function compute_ground_and_first_excited_states(
     ψ0_init = random_mps(rng, sites; linkdims=100)
     E0, ψ0 = run_dmrg(
         H, ψ0_init;
-        nsweeps=nsweeps, maxdim=maxdim, cutoff=cutoff, outputlevel=outputlevel,
-        conv_check_length=conv_check_length, conv_tol=conv_tol
+        nsweeps=nsweeps,
+        maxdim=maxdim,
+        cutoff=cutoff,
+        eigsolve_krylovdim=eigsolve_krylovdim,
+        outputlevel=outputlevel,
+        conv_check_length=conv_check_length,
+        conv_tol=conv_tol
     )
     # Now find the first excited state (orthogonal to ground state)
     ψ1_init = random_mps(rng, sites; linkdims=100)
     E1, ψ1 = run_dmrg(
-        H, ψ1_init; ψs_to_avoid=[ψ0],
-        nsweeps=nsweeps, maxdim=maxdim, cutoff=cutoff, outputlevel=outputlevel,
-        conv_check_length=conv_check_length, conv_tol=conv_tol
+        H, ψ1_init;
+        ψs_to_avoid=[ψ0],
+        nsweeps=nsweeps,
+        maxdim=maxdim,
+        cutoff=cutoff,
+        eigsolve_krylovdim=eigsolve_krylovdim,
+        outputlevel=outputlevel,
+        conv_check_length=conv_check_length,
+        conv_tol=conv_tol
     )
     return E0, ψ0, E1, ψ1
 end

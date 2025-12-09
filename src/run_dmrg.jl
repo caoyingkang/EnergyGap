@@ -37,9 +37,10 @@ for r in eachrow(df)
     sites, H = build_hamiltonian(k)
     E0, ψ0, E1, ψ1 = compute_ground_and_first_excited_states(
         sites, H,
-        nsweeps=100,
+        nsweeps=200,
         maxdim=[10, 20, 100, 100, 200],
         cutoff=1e-10,
+        eigsolve_krylovdim=30,
         outputlevel=1,
         conv_check_length=4,
         conv_tol=1e-8
@@ -63,14 +64,13 @@ scatter!(ax, df.k, df.ΔE)
 save(png_path, fig)
 
 ## --------------------------- Save results ------------------------------------
-df_to_save = df[1:5, :]
-CSV.write(csv_path, df_to_save)
+CSV.write(csv_path, df)
 
 ## --------------------------- Sanity checks on MPS ----------------------------------------
 f = h5open(h5_path, "r")
-for k in 1:5
+for k in 1:30
     psi0 = read(f, "k=$k/psi0", MPS)
     psi1 = read(f, "k=$k/psi1", MPS)
-    @show inner(psi0, psi1)
+    @show k, inner(psi0, psi1)
 end
 close(f)
