@@ -7,7 +7,7 @@ using HDF5
 include("dmrg_utils.jl")
 
 
-k_values = 1:1:30
+k_values = 1:1:25
 df = DataFrame(k=k_values, E0=NaN, E1=NaN, ΔE=NaN, log10_ΔE=NaN)
 
 results_dir = joinpath(@__DIR__, "results")
