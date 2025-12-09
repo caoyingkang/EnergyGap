@@ -40,7 +40,7 @@ for r in eachrow(df)
         nsweeps=200,
         maxdim=[10, 20, 100, 100, 200],
         cutoff=1e-10,
-        eigsolve_krylovdim=30,
+        eigsolve_krylovdim=10,
         outputlevel=1,
         conv_check_length=4,
         conv_tol=1e-8
@@ -74,3 +74,4 @@ for k in 1:30
     @show k, inner(psi0, psi1)
 end
 close(f)
+
