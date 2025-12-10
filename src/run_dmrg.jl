@@ -30,14 +30,14 @@ function build_hamiltonian(k::Int; g::Float64=1.0)
     os = OpSum()
     # horizontal bonds
     for j in 1:(m-1)
-        os += "Z", 3 * j - 2, "Z", 3 * (j + 1) - 2
-        os += "X", 3 * j, "X", 3 * (j + 1)
+        os += -1.0, "Z", 3 * j - 2, "Z", 3 * (j + 1) - 2
+        os += -1.0, "X", 3 * j, "X", 3 * (j + 1)
     end
     # vertical bonds
     for j in 1:m
-        os += g, "Z", 3 * j - 2, "Z", 3 * j - 1
-        os += "X", 3 * j - 2, "X", 3 * j - 1
-        os += "Z", 3 * j - 1, "Z", 3 * j
+        os += -1.0 * g, "Z", 3 * j - 2, "Z", 3 * j - 1
+        os += -1.0, "X", 3 * j - 2, "X", 3 * j - 1
+        os += -1.0, "Z", 3 * j - 1, "Z", 3 * j
     end
     H = MPO(os, sites)
     return sites, H
@@ -180,6 +180,7 @@ end
 
 
 k_values = 1:1:25
+g = 1.0
 df = DataFrame(k=k_values, E0=NaN, E1=NaN, ΔE=NaN, log10_ΔE=NaN)
 
 results_dir = joinpath(@__DIR__, "results")
@@ -206,7 +207,7 @@ for r in eachrow(df)
     end
     k = r.k
     println("\nComputing for k = $k (total sites: $(6*k))...")
-    sites, H = build_hamiltonian(k)
+    sites, H = build_hamiltonian(k; g=g)
     E0, ψ0, E1, ψ1 = compute_ground_and_first_excited_states(
         sites, H,
         nsweeps=200,
@@ -217,6 +218,8 @@ for r in eachrow(df)
         conv_check_length=4,
         conv_tol=1e-8
     )
+    E0 += g * 2k
+    E1 += g * 2k
     r.E0 = E0
     r.E1 = E1
     r.ΔE = E1 - E0
