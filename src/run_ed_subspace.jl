@@ -64,21 +64,41 @@ function build_reduced_Hpen(::Val{K}) where {K}
     return H_reduced
 end
 
-k_values = 1:3
+k_values = 1:4
+df = DataFrame(k=k_values, E0=NaN, E1=NaN, ΔE=NaN, log10_ΔE=NaN)
 
 results_dir = joinpath(@__DIR__, "results")
 mkpath(results_dir)
 csv_path = joinpath(results_dir, "ED_subspace_energy_gap_vs_k.csv")
 
+# Load existing data points if they exist
+if isfile(csv_path)
+    let saved_df = CSV.read(csv_path, DataFrame)
+        for r in eachrow(saved_df)
+            idx = findfirst(==(r.k), df.k)
+            df[idx, :] = r
+        end
+    end
+end
+
 
 ## --------------------------- Run ED calculation ------------------------------------
-df = DataFrame(k=Int[], E0=Float64[], E1=Float64[], ΔE=Float64[], log10_ΔE=Float64[])
-for k in k_values
+for r in eachrow(df)
+    if !isnan(r.ΔE)
+        continue
+    end
+    k = r.k
     println("\nComputing for k = $k (total sites: $(6*k))...")
     H = build_reduced_Hpen(Val(k))
+    # @show size(H), typeof(H), Base.format_bytes(Base.summarysize(H))
     Es, ψs, info = eigsolve(H, 2, :SR; ishermitian=true, verbosity=3)
-    ΔE = Es[2] - Es[1]
-    @show k, ΔE
-    push!(df, (k=k, E0=Es[1], E1=Es[2], ΔE=ΔE, log10_ΔE=log10(ΔE)))
+    r.E0 = Es[1]
+    r.E1 = Es[2]
+    r.ΔE = Es[2] - Es[1]
+    r.log10_ΔE = log10(Es[2] - Es[1])
+    println(r)
 end
+
+
+## --------------------------- Save results ------------------------------------
 CSV.write(csv_path, df)
