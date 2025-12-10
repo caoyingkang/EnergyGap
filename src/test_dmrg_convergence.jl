@@ -29,8 +29,8 @@ end
             os = OpSum()
             os += "Z", 3 * j - 2, "Z", 3 * j - 1
             zz = MPO(os, sites)
-            @test inner(psi0', zz, psi0) ≈ -1.0
-            @test inner(psi1', zz, psi1) ≈ -1.0
+            @test inner(psi0', zz, psi0) ≈ 1.0
+            @test inner(psi1', zz, psi1) ≈ 1.0
         end
     end
     close(f)
