@@ -56,6 +56,7 @@ for k in k_values
     H = build_hamiltonian(Val(k))
     Es, ψs, info = eigsolve(H, 2, :SR; ishermitian=true, verbosity=3)
     ΔE = Es[2] - Es[1]
+    @show k, ΔE
     push!(df, (k=k, E0=Es[1], E1=Es[2], ΔE=ΔE, log10_ΔE=log10(ΔE)))
 end
 CSV.write(csv_path, df)
