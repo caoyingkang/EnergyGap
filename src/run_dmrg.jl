@@ -186,7 +186,8 @@ df = DataFrame(k=k_values, E0=NaN, E1=NaN, ΔE=NaN, log10_ΔE=NaN)
 results_dir = joinpath(@__DIR__, "results")
 mkpath(results_dir)
 csv_path = joinpath(results_dir, "DMRG_energy_gap_vs_k.csv")
-png_path = joinpath(results_dir, "DMRG_energy_gap_vs_k.png")
+ΔE_vs_k_png_path = joinpath(results_dir, "DMRG_energy_gap_vs_k.png")
+E0_vs_k_png_path = joinpath(results_dir, "DMRG_E0_vs_k.png")
 h5_path = joinpath(results_dir, "DMRG_mps.h5")
 
 # Load existing data points if they exist
@@ -230,13 +231,23 @@ for r in eachrow(df)
 end
 
 ## --------------------------- Plot results ------------------------------------
-fig = Figure()
-ax = Axis(fig[1, 1], xlabel="k", ylabel="ΔE", yscale=log10, title="Energy Gap vs k")
-lines!(ax, df.k, df.ΔE)
-scatter!(ax, df.k, df.ΔE)
+fig1 = Figure()
+ax1 = Axis(fig1[1, 1], xlabel="k", ylabel="ΔE", yscale=log10, title="Energy Gap vs k")
+lines!(ax1, df.k, df.ΔE)
+scatter!(ax1, df.k, df.ΔE)
 
 # display(fig)
-save(png_path, fig)
+save(ΔE_vs_k_png_path, fig1)
+
+
+fig2 = Figure()
+ax2 = Axis(fig2[1, 1], xlabel="k", ylabel="E0", title="Ground State Energy vs k")
+lines!(ax2, df.k, df.E0)
+scatter!(ax2, df.k, df.E0)
+
+# display(fig)
+save(E0_vs_k_png_path, fig2)
+
 
 ## --------------------------- Save results ------------------------------------
 CSV.write(csv_path, df)
