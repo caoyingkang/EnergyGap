@@ -43,7 +43,7 @@ function build_reduced_hamiltonian(::Val{K}) where {K}
     return H.data
 end
 
-k_values = 1:5
+k_values = 1:6
 df = DataFrame(k=k_values, E0=NaN, E1=NaN, ΔE=NaN, log10_ΔE=NaN)
 
 results_dir = joinpath(@__DIR__, "results")
