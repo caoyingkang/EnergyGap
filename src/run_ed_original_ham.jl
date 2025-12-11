@@ -47,7 +47,7 @@ g = 1.0
 
 results_dir = joinpath(@__DIR__, "results")
 mkpath(results_dir)
-csv_path = joinpath(results_dir, "ED_energy_gap_vs_k.csv")
+csv_path = joinpath(results_dir, "ED_original_ham_energy_gap_vs_k.csv")
 
 
 ## --------------------------- Run ED calculation ------------------------------------
