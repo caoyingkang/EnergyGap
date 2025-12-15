@@ -179,7 +179,7 @@ function compute_ground_and_first_excited_states(
 end
 
 
-k_values = 1:1:25
+k_values = 1:1:27
 g = 1.0
 df = DataFrame(k=k_values, E0=NaN, E1=NaN, ΔE=NaN, log10_ΔE=NaN)
 
@@ -211,13 +211,13 @@ for r in eachrow(df)
     sites, H = build_hamiltonian(k; g=g)
     E0, ψ0, E1, ψ1 = compute_ground_and_first_excited_states(
         sites, H,
-        nsweeps=200,
+        nsweeps=300,
         maxdim=[10, 20, 100, 100, 200],
-        cutoff=1e-10,
+        cutoff=1e-12,
         eigsolve_krylovdim=10,
         outputlevel=1,
         conv_check_length=4,
-        conv_tol=1e-8
+        conv_tol=1e-10
     )
     E0 += g * 2k
     E1 += g * 2k
